@@ -18,14 +18,14 @@ enum Role {
   user
 }
 
-model Users{
-  id Int @id @default(autoincrement())
-  name String @db.VarChar(191)
-  email String @unique @db.VarChar(191)
-  no_hp String 
-  password String
-  photo_url String?
-  role Role @default(user)
+model Users {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(191)
+  email      String   @unique @db.VarChar(191)
+  no_hp      String   @unique
+  password   String
+  photo_url  String?
+  role       Role     @default(user)
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
 
