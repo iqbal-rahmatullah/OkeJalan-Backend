@@ -14,3 +14,9 @@ export const loginValidation = vine.object({
   email: vine.string().email(),
   password: vine.string().minLength(8).maxLength(100),
 })
+
+export const updateUserValidation = vine.object({
+  email: vine.string().email(),
+  name: vine.string().maxLength(100),
+  no_hp: vine.string().maxLength(50).minLength(10),
+})

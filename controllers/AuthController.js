@@ -2,6 +2,7 @@ import vine, { errors } from "@vinejs/vine"
 import {
   loginValidation,
   signUpValidation,
+  updateUserValidation,
 } from "../validation/authValidation.js"
 import prisma from "../data/db.config.js"
 import bcrypt from "bcryptjs"
@@ -30,14 +31,14 @@ class AuthController {
       if (user) {
         if (user.email === payload.email) {
           return res.status(400).json({
-            status: "error",
+            error: true,
             message: {
               email: `Email ${payload.email} already registered.`,
             },
           })
         } else if (user.no_hp === payload.no_hp) {
-          return res.status(401).json({
-            status: "error",
+          return res.status(400).json({
+            error: true,
             message: {
               no_hp: `Phone number ${payload.no_hp} already registered.`,
             },
@@ -57,12 +58,10 @@ class AuthController {
     } catch (error) {
       console.log(error)
       if (error instanceof errors.E_VALIDATION_ERROR) {
-        return res
-          .status(400)
-          .json({ status: "error", message: error.messages })
+        return res.status(400).json({ error: true, message: error.messages })
       }
       return res.status(500).json({
-        status: "error",
+        error: true,
         message: "Internal server error",
       })
     }
@@ -82,9 +81,9 @@ class AuthController {
 
       if (!user) {
         return res.status(400).json({
-          status: "error",
+          error: true,
           erorr: {
-            email: "Email belum terdaftar",
+            email: "Email is not registered.",
           },
         })
       }
@@ -97,9 +96,9 @@ class AuthController {
 
       if (!validPassword) {
         return res.status(400).json({
-          status: "error",
+          error: true,
           error: {
-            password: "Password yang anda masukkan salah",
+            password: "Password is incorrect.",
           },
         })
       }
@@ -117,19 +116,17 @@ class AuthController {
       })
 
       return res.status(200).json({
-        message: "Login berhasil",
+        message: "Login success",
         token,
       })
     } catch (error) {
       console.log(error)
       if (error instanceof errors.E_VALIDATION_ERROR) {
-        return res
-          .status(400)
-          .json({ status: "error", message: error.messages })
+        return res.status(400).json({ error: true, message: error.messages })
       }
       return res
         .status(500)
-        .json({ status: "error", message: "Internal server error" })
+        .json({ error: true, message: "Internal server error" })
     }
   }
 
@@ -139,12 +136,73 @@ class AuthController {
 
       return res
         .status(200)
-        .json({ message: "Berhasil mendapatkan detail user", data: user })
+        .json({ message: "Succesfully get detail user", data: user })
     } catch (error) {
       console.log(error)
       return res
         .status(500)
-        .json({ status: "error", message: "Terjadi kesalahan server." })
+        .json({ error: true, message: "Internal server error." })
+    }
+  }
+
+  static updateUser = async (req, res) => {
+    try {
+      const validator = vine.compile(updateUserValidation)
+      const payload = await validator.validate(req.body)
+      const user = req.user
+
+      //check email/phone if already exist
+      const userValidate = await prisma.users.findFirst({
+        where: {
+          OR: [
+            {
+              email: payload.email,
+              NOT: { id: user.id },
+            },
+            {
+              no_hp: payload.no_hp,
+              NOT: { id: user.id },
+            },
+          ],
+        },
+      })
+
+      if (userValidate) {
+        if (userValidate.email === payload.email) {
+          return res.status(400).json({
+            error: true,
+            message: {
+              email: `Email ${payload.email} already registered.`,
+            },
+          })
+        } else if (userValidate.no_hp === payload.no_hp) {
+          return res.status(400).json({
+            error: true,
+            message: {
+              no_hp: `Phone number ${payload.no_hp} already registered.`,
+            },
+          })
+        }
+      }
+
+      await prisma.users.update({
+        where: {
+          id: user.id,
+        },
+        data: payload,
+      })
+
+      return res
+        .status(200)
+        .json({ message: "Succesfully update data user", data: payload })
+    } catch (error) {
+      console.log(error)
+      if (error instanceof errors.E_VALIDATION_ERROR) {
+        return res.status(400).json({ error: true, message: error.messages })
+      }
+      return res
+        .status(500)
+        .json({ error: true, message: "Internal server error" })
     }
   }
 }
