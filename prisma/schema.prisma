@@ -18,16 +18,130 @@ enum Role {
   user
 }
 
+enum Status {
+  pending
+  success
+  failed
+}
+
+enum TransactionStatus {
+  done
+  pending
+}
+
+enum RuteType {
+  berangkat
+  balik
+}
+
 model Users {
+  id          Int           @id @default(autoincrement())
+  name        String        @db.VarChar(191)
+  email       String        @unique @db.VarChar(191)
+  no_hp       String        @unique
+  password    String
+  photo_url   String?
+  role        Role          @default(user)
+  balance     Int           @default(0)
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @default(now())
+  Payment     Payment[]
+  Transaction Transaction[]
+  Angkot      Angkot[]
+
+  @@map("user")
+}
+
+model Payment {
   id         Int      @id @default(autoincrement())
-  name       String   @db.VarChar(191)
-  email      String   @unique @db.VarChar(191)
-  no_hp      String   @unique
-  password   String
-  photo_url  String?
-  role       Role     @default(user)
+  user_id    Int
+  amount     Int
+  method     String
+  status     Status   @default(pending)
+  user       Users    @relation(fields: [user_id], references: [id])
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
 
-  @@map("user")
+  @@map("payment")
+}
+
+model Transaction {
+  id         Int               @id @default(autoincrement())
+  user_id    Int
+  angkot_id  Int
+  tujuan_id  Int
+  asal_id    Int
+  status     TransactionStatus @default(pending)
+  tanggal    DateTime          @default(now())
+  price      Int
+  user       Users             @relation(fields: [user_id], references: [id])
+  angkot     Angkot            @relation(fields: [angkot_id], references: [id])
+  created_at DateTime          @default(now())
+  updated_at DateTime          @default(now())
+
+  @@map("transaction")
+}
+
+model Angkot {
+  id          Int           @id @default(autoincrement())
+  name        String
+  id_sopir    Int
+  kuota       Int
+  sopir       Users         @relation(fields: [id_sopir], references: [id])
+  Transaction Transaction[]
+
+  @@map("angkot")
+}
+
+model Fasilitas {
+  id        Int    @id @default(autoincrement())
+  id_angkot Int
+  name      String
+  icon      String
+
+  @@map("fasilitas")
+}
+
+model Rating {
+  id               Int    @id @default(autoincrement())
+  user_id          Int
+  angkot_id        Int
+  rating_pelayanan Int
+  rating_fasilitas Int
+  komentar         String
+
+  @@map("rating")
+}
+
+model Rute {
+  id        Int      @id @default(autoincrement())
+  id_angkot Int
+  alamat    String
+  lat       String
+  long      String
+  jam_tiba  String
+  tipe      RuteType
+
+  @@map("rute")
+}
+
+model Chat {
+  id             Int      @id @default(autoincrement())
+  transaction_id Int
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now())
+
+  @@map("chat")
+}
+
+model ChatDetail {
+  id          Int      @id @default(autoincrement())
+  chat_id     Int
+  sender_id   Int
+  receiver_id Int
+  message     String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+
+  @@map("chat_detail")
 }
