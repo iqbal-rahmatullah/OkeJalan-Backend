@@ -9,10 +9,11 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cors())
 
-
 import authRouter from "./routes/auth.route.js"
+import ruteRouter from "./routes/rute.route.js"
 app.get("/", (req, res) => res.json({ message: "OkeJalan API V1" }))
 app.use("/api/v1/auth", authRouter)
+app.use("/api/v1/rute", ruteRouter)
 
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`)
