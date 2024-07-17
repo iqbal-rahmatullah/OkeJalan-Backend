@@ -48,6 +48,7 @@ model Users {
   payment     Payment[]
   transaction Transaction[]
   angkot      Angkot[]
+  rating      Rating[]
 
   @@map("user")
 }
@@ -87,9 +88,12 @@ model Angkot {
   name        String
   id_sopir    Int
   kuota       Int
+  image       String
   sopir       Users         @relation(fields: [id_sopir], references: [id])
   transaction Transaction[]
   rute        Rute[]
+  fasilitas   Fasilitas[]
+  rating      Rating[]
 
   @@map("angkot")
 }
@@ -99,6 +103,7 @@ model Fasilitas {
   id_angkot Int
   name      String
   icon      String
+  angkot    Angkot @relation(fields: [id_angkot], references: [id])
 
   @@map("fasilitas")
 }
@@ -110,6 +115,8 @@ model Rating {
   rating_pelayanan Int
   rating_fasilitas Int
   komentar         String
+  angkot           Angkot @relation(fields: [angkot_id], references: [id])
+  users            Users  @relation(fields: [user_id], references: [id])
 
   @@map("rating")
 }
@@ -122,7 +129,7 @@ model Rute {
   long      String
   jam_tiba  String
   tipe      RuteType
-  Angkot    Angkot?  @relation(fields: [id_angkot], references: [id])
+  angkot    Angkot   @relation(fields: [id_angkot], references: [id])
 
   @@map("rute")
 }

@@ -213,37 +213,32 @@ const ruteSeeder = async () => {
     },
   ]
 
+  let startJam = 5
   for (let i = 0; i < rute_angkot1.length; i++) {
-    let startJam = 10
-
     await prisma.rute.create({
       data: {
         id_angkot: angkot[0].id,
         alamat: rute_angkot1[i].name,
         lat: rute_angkot1[i].lat.toString(),
         long: rute_angkot1[i].lng.toString(),
-        jam_tiba: `${startJam}:00`,
+        jam_tiba: `${startJam++}:00`,
         tipe: "berangkat",
       },
     })
-
-    startJam += 1
   }
 
+  startJam = 5
   for (let i = 0; i < rute_angkot2.length; i++) {
-    let startJam = 10
     await prisma.rute.create({
       data: {
         id_angkot: angkot[1].id,
         alamat: rute_angkot2[i].name,
         lat: rute_angkot2[i].lat.toString(),
         long: rute_angkot2[i].lng.toString(),
-        jam_tiba: `${startJam}:00`,
+        jam_tiba: `${startJam++}:00`,
         tipe: "berangkat",
       },
     })
-
-    startJam += 1
   }
 }
 

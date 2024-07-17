@@ -12,6 +12,7 @@ const angkotSeeder = async () => {
     await prisma.angkot.create({
       data: {
         name: angkotName[i],
+        image: `angkot${i + 1}.png`,
         id_sopir: sopir[i].id,
         kuota: 20,
       },
