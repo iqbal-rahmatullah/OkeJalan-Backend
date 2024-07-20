@@ -82,7 +82,7 @@ class AuthController {
       if (!user) {
         return res.status(400).json({
           error: true,
-          erorr: {
+          message: {
             email: "Email is not registered.",
           },
         })
@@ -97,7 +97,7 @@ class AuthController {
       if (!validPassword) {
         return res.status(400).json({
           error: true,
-          error: {
+          message: {
             password: "Password is incorrect.",
           },
         })
@@ -106,6 +106,7 @@ class AuthController {
       const jwtPayload = {
         id: user.id,
         email: user.email,
+        name: user.name,
         no_hp: user.no_hp,
         photo_url: user.photo_url,
         role: user.role,
@@ -192,9 +193,15 @@ class AuthController {
         data: payload,
       })
 
+      const newData = await prisma.users.findFirst({
+        where: {
+          id: user.id,
+        },
+      })
+
       return res
         .status(200)
-        .json({ message: "Succesfully update data user", data: payload })
+        .json({ message: "Succesfully update data user", data: newData })
     } catch (error) {
       console.log(error)
       if (error instanceof errors.E_VALIDATION_ERROR) {
