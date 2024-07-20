@@ -110,6 +110,7 @@ class AuthController {
         no_hp: user.no_hp,
         photo_url: user.photo_url,
         role: user.role,
+        balance: user.balance,
       }
 
       const token = jwt.sign(jwtPayload, process.env.JWT_SECRET_KEY, {
