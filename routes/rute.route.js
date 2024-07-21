@@ -8,5 +8,6 @@ ruteRouter.get("/", (req, res) => {
 })
 ruteRouter.get("/get-all", authMiddleware, RuteController.getAllRute)
 ruteRouter.get("/get-rute-angkot", authMiddleware, RuteController.getRuteAngkot)
+ruteRouter.get("/search/:key", authMiddleware, RuteController.searchRute)
 
 export default ruteRouter

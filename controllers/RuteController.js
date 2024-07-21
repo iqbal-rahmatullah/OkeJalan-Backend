@@ -47,6 +47,39 @@ class RuteController {
         .json({ error: true, message: "Internal server error" })
     }
   }
+
+  static async searchRute(req, res) {
+    try {
+      const { key } = req.params
+      let response = await prisma.rute.findMany({
+        where: {
+          alamat: {
+            contains: key,
+          },
+        },
+      })
+
+      if (response.length === 0) {
+        return res.status(404).json({
+          message: "Data not found",
+          data: response,
+        })
+      }
+
+      const filteredResponse = response.filter(
+        (v, i, a) => a.findIndex((t) => t.alamat === v.alamat) === i
+      )
+
+      return res.status(200).json({
+        message: "Successfully search rute",
+        data: filteredResponse,
+      })
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ error: true, message: "Internal server error" })
+    }
+  }
 }
 
 export default RuteController
