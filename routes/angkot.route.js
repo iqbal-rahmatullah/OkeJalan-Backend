@@ -13,5 +13,10 @@ angkotRouter.get(
   AngkotController.getRatingAngkot
 )
 angkotRouter.get("/get-image/:file_name", AngkotController.getImageAngkot)
+angkotRouter.get(
+  "/favorite",
+  authMiddleware,
+  AngkotController.getFavoriteAngkot
+)
 
 export default angkotRouter

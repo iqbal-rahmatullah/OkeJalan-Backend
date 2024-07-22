@@ -139,6 +139,52 @@ class AngkotController {
       res.status(500).json({ error: true, message: "Internal server error" })
     }
   }
+
+  static async getFavoriteAngkot(req, res) {
+    try {
+      let response = await prisma.favorite.findMany({
+        where: {
+          user_id: req.user.id,
+        },
+        include: {
+          angkot: {
+            include: {
+              rute: true,
+            },
+          },
+        },
+      })
+
+      if (response.length == 0) {
+        return res.status(404).json({
+          message: "Favorite angkot not found",
+          data: response,
+        })
+      }
+
+      response = response.map((v) => {
+        const rute_awal =
+          v.angkot.rute.length > 0 ? v.angkot.rute[0].alamat : null
+        const rute_akhir =
+          v.angkot.rute.length > 0
+            ? v.angkot.rute[v.angkot.rute.length - 1].alamat
+            : null
+        return {
+          ...v,
+          rute_awal,
+          rute_akhir,
+        }
+      })
+
+      return res.status(200).json({
+        message: "Successfully get favorite angkot",
+        data: response,
+      })
+    } catch (error) {
+      console.error("Error sending image:", error)
+      res.status(500).json({ error: true, message: "Internal server error" })
+    }
+  }
 }
 
 export default AngkotController

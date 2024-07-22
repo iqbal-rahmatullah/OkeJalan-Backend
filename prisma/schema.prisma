@@ -49,6 +49,7 @@ model Users {
   transaction Transaction[]
   angkot      Angkot[]
   rating      Rating[]
+  Favorite    Favorite[]
 
   @@map("user")
 }
@@ -94,6 +95,7 @@ model Angkot {
   rute        Rute[]
   fasilitas   Fasilitas[]
   rating      Rating[]
+  Favorite    Favorite[]
 
   @@map("angkot")
 }
@@ -153,4 +155,14 @@ model ChatDetail {
   updated_at  DateTime @default(now())
 
   @@map("chat_detail")
+}
+
+model Favorite {
+  id        Int    @id @default(autoincrement())
+  user_id   Int
+  angkot_id Int
+  user      Users  @relation(fields: [user_id], references: [id])
+  angkot    Angkot @relation(fields: [angkot_id], references: [id])
+
+  @@map("favorite")
 }
