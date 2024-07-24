@@ -80,6 +80,28 @@ class RuteController {
         .json({ error: true, message: "Internal server error" })
     }
   }
+
+  static async addFavorite(req, res) {
+    try {
+      const { angkot_id } = req.body
+
+      const response = await prisma.favorite.create({
+        data: {
+          angkot_id: parseInt(angkot_id),
+          user_id: req.user.id,
+        },
+      })
+
+      return res.status(201).json({
+        message: "Successfully add favorite",
+        data: response,
+      })
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ error: true, message: "Internal server error" })
+    }
+  }
 }
 
 export default RuteController
