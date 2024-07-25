@@ -13,11 +13,13 @@ import authRouter from "./routes/auth.route.js"
 import ruteRouter from "./routes/rute.route.js"
 import angkotRouter from "./routes/angkot.route.js"
 import transactionRouter from "./routes/transaction.route.js"
+import jadwalRouter from "./routes/jadwal.route.js"
 app.get("/", (req, res) => res.json({ message: "OkeJalan API V1" }))
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/rute", ruteRouter)
 app.use("/api/v1/angkot", angkotRouter)
 app.use("/api/v1/transaction", transactionRouter)
+app.use("/api/v1/jadwal", jadwalRouter)
 
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`)
