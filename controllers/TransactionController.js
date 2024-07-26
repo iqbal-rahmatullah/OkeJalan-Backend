@@ -1,5 +1,6 @@
 import axios from "axios"
 import prisma from "../data/db.config.js"
+import { parse } from "dotenv"
 
 class TransactionController {
   static async getPrice(req, res) {
@@ -38,6 +39,25 @@ class TransactionController {
       const user_id = req.user.id
       const { angkot_id, tujuan_id, asal_id, price } = req.body
 
+      const user = await prisma.users.findFirst({
+        where: {
+          id: user_id,
+        },
+      })
+
+      if (user.balance < parseInt(price)) {
+        return res.status(400).json({
+          error: true,
+          data: {
+            balance: user.balance,
+            price: parseInt(price),
+          },
+          message: {
+            balance: "Insufficient balance",
+          },
+        })
+      }
+
       const response = await prisma.transaction.create({
         data: {
           user_id,
@@ -48,6 +68,14 @@ class TransactionController {
         },
       })
 
+      await prisma.users.update({
+        where: {
+          id: user_id,
+        },
+        data: {
+          balance: user.balance - parseInt(price),
+        },
+      })
       return res.status(200).json({
         message: "Successfully create transaction",
         data: response,
