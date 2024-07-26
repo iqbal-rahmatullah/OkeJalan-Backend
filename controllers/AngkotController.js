@@ -54,6 +54,7 @@ class AngkotController {
         message: "Successfully search angkot",
         data: {
           tujuan,
+          lokasi_awal,
           angkot: matchedAngkots,
         },
       })
