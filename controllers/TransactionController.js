@@ -16,6 +16,7 @@ class TransactionController {
       const durationAsMinute = calculate.data.rows[0].elements[0].duration.text
 
       const price = 4000 * (distance / 1000)
+      const fixPrice = Math.ceil(price / 1000) * 1000
 
       return res.status(200).json({
         message: "Successfully get price",
@@ -24,7 +25,7 @@ class TransactionController {
           distanceAsString,
           durationAsSecond,
           durationAsMinute,
-          price,
+          price: fixPrice,
         },
       })
     } catch (error) {
