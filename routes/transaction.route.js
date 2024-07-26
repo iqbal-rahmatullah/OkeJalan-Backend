@@ -11,5 +11,10 @@ transactionRouter.get(
   authMiddleware,
   TransactionController.getPrice
 )
+transactionRouter.post(
+  "/add-transaction",
+  authMiddleware,
+  TransactionController.createTransaction
+)
 
 export default transactionRouter
