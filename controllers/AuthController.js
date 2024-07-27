@@ -134,7 +134,11 @@ class AuthController {
 
   static detailUser = async (req, res) => {
     try {
-      const user = req.user
+      const user = await prisma.users.findFirst({
+        where: {
+          id: req.user.id,
+        },
+      })
 
       return res
         .status(200)
