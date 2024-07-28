@@ -29,6 +29,12 @@ enum TransactionStatus {
   pending
 }
 
+enum PaymentStatus {
+  pending
+  success
+  failed
+}
+
 enum RuteType {
   berangkat
   balik
@@ -55,14 +61,14 @@ model Users {
 }
 
 model Payment {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
-  amount     Int
-  method     String
-  status     Status   @default(pending)
-  user       Users    @relation(fields: [user_id], references: [id])
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
+  id                String   @id @default(uuid())
+  user_id           Int
+  amount            Int
+  response_midtrans String   @db.Text
+  status            Status   @default(pending)
+  user              Users    @relation(fields: [user_id], references: [id])
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now())
 
   @@map("payment")
 }
