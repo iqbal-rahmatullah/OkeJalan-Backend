@@ -47,6 +47,7 @@ model Users {
   no_hp       String        @unique
   password    String
   photo_url   String?
+  is_new      Boolean       @default(true)
   role        Role          @default(user)
   balance     Int           @default(0)
   created_at  DateTime      @default(now())

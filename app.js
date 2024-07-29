@@ -16,7 +16,6 @@ import transactionRouter from "./routes/transaction.route.js"
 import jadwalRouter from "./routes/jadwal.route.js"
 import paymentRouter from "./routes/payment.route.js"
 app.get("/", (req, res) => {
-  console.log("masok")
   res.json({ message: "OkeJalan API V1" })
 })
 app.use("/api/v1/auth", authRouter)

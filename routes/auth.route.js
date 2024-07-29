@@ -11,5 +11,6 @@ authRouter.post("/signup", AuthController.signUp)
 authRouter.post("/login", AuthController.login)
 authRouter.get("/detail-user", authMiddleware, AuthController.detailUser)
 authRouter.put("/update-user", authMiddleware, AuthController.updateUser)
+authRouter.put("/set-onboarding", authMiddleware, AuthController.setOnboarding)
 
 export default authRouter

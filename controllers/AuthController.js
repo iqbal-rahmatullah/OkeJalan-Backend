@@ -111,6 +111,7 @@ class AuthController {
         photo_url: user.photo_url,
         role: user.role,
         balance: user.balance,
+        is_new: user.is_new,
       }
 
       const token = jwt.sign(jwtPayload, process.env.JWT_SECRET_KEY, {
@@ -215,6 +216,34 @@ class AuthController {
       return res
         .status(500)
         .json({ error: true, message: "Internal server error" })
+    }
+  }
+
+  static async setOnboarding(req, res) {
+    try {
+      const response = await prisma.users.update({
+        where: {
+          id: req.user.id,
+        },
+        data: {
+          is_new: false,
+        },
+      })
+
+      return res.status(200).json({
+        status: "success",
+        data: response,
+      })
+    } catch (error) {
+      console.log(error)
+      if (error instanceof errors.E_VALIDATION_ERROR) {
+        return res.status(400).json({ error: true, message: error.messages })
+      }
+      return res.status(500).json({
+        error: true,
+        message: "Internal server error",
+        data: error.message,
+      })
     }
   }
 }
