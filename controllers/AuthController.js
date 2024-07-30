@@ -133,6 +133,81 @@ class AuthController {
     }
   }
 
+  static loginDriver = async (req, res) => {
+    try {
+      const validation = vine.compile(loginValidation)
+      const payload = await validation.validate(req.body)
+
+      //check email
+      const user = await prisma.users.findFirst({
+        where: {
+          email: payload.email,
+        },
+      })
+
+      if (!user) {
+        return res.status(400).json({
+          error: true,
+          message: {
+            email: "Email is not registered.",
+          },
+        })
+      }
+
+      //check password
+      const validPassword = await bcrypt.compare(
+        payload.password,
+        user.password
+      )
+
+      if (!validPassword) {
+        return res.status(400).json({
+          error: true,
+          message: {
+            password: "Password is incorrect.",
+          },
+        })
+      }
+
+      if (user.role !== "driver") {
+        return res.status(400).json({
+          error: true,
+          message: {
+            role: "You don't have permission..",
+          },
+        })
+      }
+
+      const jwtPayload = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        no_hp: user.no_hp,
+        photo_url: user.photo_url,
+        role: user.role,
+        balance: user.balance,
+        is_new: user.is_new,
+      }
+
+      const token = jwt.sign(jwtPayload, process.env.JWT_SECRET_KEY, {
+        expiresIn: "365d",
+      })
+
+      return res.status(200).json({
+        message: "Login success",
+        token,
+      })
+    } catch (error) {
+      console.log(error)
+      if (error instanceof errors.E_VALIDATION_ERROR) {
+        return res.status(400).json({ error: true, message: error.messages })
+      }
+      return res
+        .status(500)
+        .json({ error: true, message: "Internal server error" })
+    }
+  }
+
   static detailUser = async (req, res) => {
     try {
       const user = await prisma.users.findFirst({
@@ -140,6 +215,22 @@ class AuthController {
           id: req.user.id,
         },
       })
+
+      if (user.role === "driver") {
+        const angkot = await prisma.angkot.findFirst({
+          where: {
+            id_sopir: user.id,
+          },
+        })
+
+        return res.status(200).json({
+          message: "Succesfully get detail user",
+          data: {
+            ...user,
+            angkot_id: angkot.id,
+          },
+        })
+      }
 
       return res
         .status(200)

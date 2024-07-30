@@ -146,6 +146,7 @@ model Rute {
   long      String
   jam_tiba  String
   tipe      RuteType
+  is_done   Boolean       @default(false)
   angkot    Angkot        @relation(fields: [id_angkot], references: [id])
   tujuan    Transaction[] @relation("tujuan")
   asal      Transaction[] @relation("asal")
