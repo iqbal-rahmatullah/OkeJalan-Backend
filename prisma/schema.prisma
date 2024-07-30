@@ -47,6 +47,8 @@ model Users {
   no_hp       String        @unique
   password    String
   photo_url   String?
+  lat         String?
+  long        String?
   is_new      Boolean       @default(true)
   role        Role          @default(user)
   balance     Int           @default(0)

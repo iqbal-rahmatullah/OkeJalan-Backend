@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `user` ADD COLUMN `lat` VARCHAR(191) NULL,
+    ADD COLUMN `long` VARCHAR(191) NULL;

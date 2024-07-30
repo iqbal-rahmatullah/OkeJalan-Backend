@@ -4,8 +4,13 @@ import TransactionController from "../controllers/TransactionController.js"
 const transactionRouter = Router()
 
 transactionRouter.get("/", (req, res) => {
-  res.json({ message: "OkeJalan rute service" })
+  res.json({ message: "OkeJalan transaction service" })
 })
+transactionRouter.get(
+  "/all/:status",
+  authMiddleware,
+  TransactionController.getTransaction
+)
 transactionRouter.get(
   "/get-price",
   authMiddleware,

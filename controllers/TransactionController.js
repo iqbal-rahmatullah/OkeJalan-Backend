@@ -1,14 +1,42 @@
 import axios from "axios"
 import prisma from "../data/db.config.js"
-import { parse } from "dotenv"
 
 class TransactionController {
+  static async getTransaction(req, res) {
+    try {
+      const response = await prisma.transaction.findMany({
+        where: {
+          user_id: req.user.id,
+          status: req.query.status,
+        },
+      })
+
+      if (response.length == 0) {
+        return res.status(404).json({
+          message: "Data not found",
+          data: response,
+        })
+      }
+
+      return res.status(200).json({
+        message: "Successfully get data",
+        data: response,
+      })
+    } catch (error) {
+      return res.status(500).json({
+        error: true,
+        message: "Internal server error",
+        data: error.message,
+      })
+    }
+  }
+
   static async getPrice(req, res) {
     try {
       const { originLat, originLng, destinationLng, destinationLat } = req.body
 
       const calculate = await axios.get(
-        `https://api.distancematrix.ai/maps/api/distancematrix/json?origins=${originLat},${originLng}&destinations=${destinationLat},${destinationLng}&key=${process.env.DISTANCE_MATRIX_API_KEY}`
+        `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${originLat},${originLng}&destinations=${destinationLat},${destinationLng}&key=${process.env.GOOGLE_MAP_KEY}`
       )
       const distance = calculate.data.rows[0].elements[0].distance.value
       const distanceAsString = calculate.data.rows[0].elements[0].distance.text
@@ -38,7 +66,7 @@ class TransactionController {
   static async createTransaction(req, res) {
     try {
       const user_id = req.user.id
-      const { angkot_id, tujuan_id, asal_id, price } = req.body
+      const { angkot_id, tujuan_id, asal_id, price, date } = req.body
 
       const user = await prisma.users.findFirst({
         where: {
@@ -66,6 +94,7 @@ class TransactionController {
           tujuan_id: parseInt(tujuan_id),
           asal_id: parseInt(asal_id),
           price: parseInt(price),
+          tanggal: new Date(date),
         },
       })
 
