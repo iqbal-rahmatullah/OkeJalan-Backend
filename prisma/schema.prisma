@@ -26,6 +26,7 @@ enum Status {
 
 enum TransactionStatus {
   done
+  on_going
   pending
 }
 
@@ -87,8 +88,11 @@ model Transaction {
   price      Int
   user       Users             @relation(fields: [user_id], references: [id])
   angkot     Angkot            @relation(fields: [angkot_id], references: [id])
+  tujuan     Rute              @relation("tujuan", fields: [tujuan_id], references: [id])
+  asal       Rute              @relation("asal", fields: [asal_id], references: [id])
   created_at DateTime          @default(now())
   updated_at DateTime          @default(now())
+  rating     Rating[]
 
   @@map("transaction")
 }
@@ -120,27 +124,31 @@ model Fasilitas {
 }
 
 model Rating {
-  id               Int    @id @default(autoincrement())
+  id               Int         @id @default(autoincrement())
   user_id          Int
   angkot_id        Int
   rating_pelayanan Int
   rating_fasilitas Int
+  transaction_id   Int
   komentar         String
-  angkot           Angkot @relation(fields: [angkot_id], references: [id])
-  users            Users  @relation(fields: [user_id], references: [id])
+  angkot           Angkot      @relation(fields: [angkot_id], references: [id])
+  users            Users       @relation(fields: [user_id], references: [id])
+  transaction      Transaction @relation(fields: [transaction_id], references: [id])
 
   @@map("rating")
 }
 
 model Rute {
-  id        Int      @id @default(autoincrement())
+  id        Int           @id @default(autoincrement())
   id_angkot Int
   alamat    String
   lat       String
   long      String
   jam_tiba  String
   tipe      RuteType
-  angkot    Angkot   @relation(fields: [id_angkot], references: [id])
+  angkot    Angkot        @relation(fields: [id_angkot], references: [id])
+  tujuan    Transaction[] @relation("tujuan")
+  asal      Transaction[] @relation("asal")
 
   @@map("rute")
 }

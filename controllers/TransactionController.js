@@ -6,10 +6,24 @@ import { id } from "date-fns/locale"
 class TransactionController {
   static async getTransaction(req, res) {
     try {
+      const { status } = req.params
+
       const response = await prisma.transaction.findMany({
         where: {
           user_id: req.user.id,
-          status: req.query.status,
+          OR:
+            status === "pending"
+              ? [{ status: "pending" }, { status: "on_going" }]
+              : [{ status }],
+        },
+        include: {
+          asal: true,
+          tujuan: true,
+          angkot: {
+            include: {
+              sopir: true,
+            },
+          },
         },
       })
 
