@@ -3,6 +3,7 @@ import {
   loginValidation,
   signUpValidation,
   updateUserValidation,
+  updateLocationValidation,
 } from "../validation/authValidation.js"
 import prisma from "../data/db.config.js"
 import bcrypt from "bcryptjs"
@@ -327,6 +328,37 @@ class AuthController {
       })
     } catch (error) {
       console.log(error)
+      if (error instanceof errors.E_VALIDATION_ERROR) {
+        return res.status(400).json({ error: true, message: error.messages })
+      }
+      return res.status(500).json({
+        error: true,
+        message: "Internal server error",
+        data: error.message,
+      })
+    }
+  }
+
+  static async updateLocation(req, res) {
+    try {
+      const validation = vine.compile(updateLocationValidation)
+      const payload = await validation.validate(req.body)
+
+      const response = await prisma.users.update({
+        data: {
+          lat: payload.lat.toString(),
+          long: payload.long.toString(),
+        },
+        where: {
+          id: req.user.id,
+        },
+      })
+
+      return res.status(200).json({
+        message: "Successfully update location",
+        data: response,
+      })
+    } catch (error) {
       if (error instanceof errors.E_VALIDATION_ERROR) {
         return res.status(400).json({ error: true, message: error.messages })
       }

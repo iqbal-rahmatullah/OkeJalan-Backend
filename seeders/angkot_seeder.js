@@ -1,7 +1,7 @@
 import prisma from "../data/db.config.js"
 
 const angkotSeeder = async () => {
-  const angkotName = ["AG", "AL"]
+  const angkotName = ["AG"]
   const sopir = await prisma.users.findMany({
     where: {
       role: "driver",

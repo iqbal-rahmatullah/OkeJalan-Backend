@@ -102,6 +102,65 @@ class RuteController {
         .json({ error: true, message: "Internal server error" })
     }
   }
+
+  static async getJumlahPenumpang(req, res) {
+    try {
+      const now = new Date()
+      now.setTime(now.getTime() + 7 * 60 * 60 * 1000)
+      const startDay = new Date(now)
+      startDay.setHours(0, 0, 0, 0)
+      const endDay = new Date(now)
+      endDay.setHours(23, 59, 59, 999)
+
+      const response = await prisma.transaction.findMany({
+        where: {
+          asal_id: parseInt(req.params.id_rute),
+          NOT: {
+            status: "done",
+          },
+          tanggal: {
+            gte: startDay,
+            lte: endDay,
+          },
+        },
+      })
+
+      return res.status(200).json({
+        message: "Successfully get jumlah penumpang",
+        data: {
+          penumpang: response.length,
+        },
+      })
+    } catch (error) {
+      return res.status(500).json({
+        error: true,
+        message: "Internal server error",
+        data: error.message,
+      })
+    }
+  }
+
+  static async getRutePerjalanan(req, res) {
+    try {
+      const { angkot_id, tipe } = req.body
+      let response = await prisma.rute.findMany({
+        where: {
+          id_angkot: parseInt(angkot_id),
+          tipe: tipe,
+          // is_done: false,
+        },
+      })
+
+      return res.status(200).json({
+        message: "Successfully get rute angkot",
+        data: response,
+      })
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ error: true, message: "Internal server error" })
+    }
+  }
 }
 
 export default RuteController

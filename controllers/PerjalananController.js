@@ -10,14 +10,12 @@ class PerjalananController {
         where: {
           id_angkot: parseInt(id_angkot),
           tipe: "berangkat",
-          is_done: false,
         },
       })
       const rutePulang = await prisma.rute.findMany({
         where: {
           id_angkot: parseInt(id_angkot),
           tipe: "balik",
-          is_done: false,
         },
       })
 

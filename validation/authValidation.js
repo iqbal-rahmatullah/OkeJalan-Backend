@@ -20,3 +20,8 @@ export const updateUserValidation = vine.object({
   name: vine.string().maxLength(100),
   no_hp: vine.string().maxLength(50).minLength(10),
 })
+
+export const updateLocationValidation = vine.object({
+  lat: vine.number(),
+  long: vine.number(),
+})
