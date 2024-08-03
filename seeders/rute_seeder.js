@@ -264,7 +264,7 @@ const ruteSeeder = async () => {
       lng: 112.6254,
     },
     {
-      name: "Jl. Letjen Sutoyo 91, Surakarta",
+      name: "Jl. Letjen Sutoyo 91",
       lat: -7.959943021418966,
       lng: 112.63694279917416,
     },
@@ -274,7 +274,7 @@ const ruteSeeder = async () => {
       lng: 112.6254,
     },
     {
-      name: "Jl. Raden Intan 103",
+      name: "Terminal Arjosari",
       lat: -7.9615,
       lng: 112.626,
     },

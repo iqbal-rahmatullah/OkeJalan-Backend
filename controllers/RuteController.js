@@ -21,12 +21,18 @@ class RuteController {
 
   static async getRuteAngkot(req, res) {
     try {
-      let response = await prisma.angkot.findMany({
+      let finalResponse = []
+
+      let responseBerangkat = await prisma.angkot.findMany({
         include: {
-          rute: true,
+          rute: {
+            where: {
+              tipe: "berangkat",
+            },
+          },
         },
       })
-      response = response.map((v) => {
+      responseBerangkat = responseBerangkat.map((v) => {
         const rute_awal = v.rute.length > 0 ? v.rute[0].alamat : null
         const rute_akhir =
           v.rute.length > 0 ? v.rute[v.rute.length - 1].alamat : null
@@ -37,9 +43,31 @@ class RuteController {
         }
       })
 
+      let responseBalik = await prisma.angkot.findMany({
+        include: {
+          rute: {
+            where: {
+              tipe: "balik",
+            },
+          },
+        },
+      })
+      responseBalik = responseBalik.map((v) => {
+        const rute_awal = v.rute.length > 0 ? v.rute[0].alamat : null
+        const rute_akhir =
+          v.rute.length > 0 ? v.rute[v.rute.length - 1].alamat : null
+        return {
+          ...v,
+          rute_awal,
+          rute_akhir,
+        }
+      })
+
+      finalResponse = responseBerangkat.concat(responseBalik)
+
       return res.status(200).json({
         message: "Successfully get rute angkot",
-        data: response,
+        data: finalResponse,
       })
     } catch (error) {
       return res

@@ -37,7 +37,11 @@ class TransactionController {
       const finalResponse = response.map((item) => {
         return {
           ...item,
-          tanggal: format(item.tanggal, "dd MMMM yyyy, HH:mm", { locale: id }),
+          tanggal: format(
+            new Date(item.tanggal.getTime() - 7 * 60 * 60 * 1000),
+            "dd MMMM yyyy, HH:mm",
+            { locale: id }
+          ),
         }
       })
 
@@ -109,6 +113,8 @@ class TransactionController {
           },
         })
       }
+
+      console.log(date)
 
       const response = await prisma.transaction.create({
         data: {
