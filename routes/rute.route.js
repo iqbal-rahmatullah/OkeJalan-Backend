@@ -18,7 +18,7 @@ ruteRouter.get(
 )
 ruteRouter.get(
   "/get-rute-perjalanan",
-  authDriverMiddleware,
+  authMiddleware,
   RuteController.getRutePerjalanan
 )
 

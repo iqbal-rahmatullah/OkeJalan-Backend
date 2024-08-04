@@ -50,6 +50,39 @@ class PerjalananController {
       })
     }
   }
+
+  static async getLocationDriver(req, res) {
+    try {
+      const response = await prisma.users.findFirst({
+        where: {
+          id: parseInt(req.params.id_driver),
+        },
+        select: {
+          lat: true,
+          long: true,
+        },
+      })
+
+      if (response.lat === null || response.long === null) {
+        return res.status(404).json({
+          error: true,
+          message: "Driver belum memulai perjalanan",
+        })
+      }
+
+      return res.status(200).json({
+        message: "Successfully get driver location",
+        data: response,
+      })
+    } catch (error) {
+      console.log(error)
+      return res.status(500).json({
+        error: true,
+        message: "Internal server error",
+        data: error.message,
+      })
+    }
+  }
 }
 
 export default PerjalananController
