@@ -1,4 +1,6 @@
+import axios from "axios"
 import prisma from "../data/db.config.js"
+import getDistanceFromLatLonInKm from "../utils/DistanceHaversine.js"
 
 class RuteController {
   static async getAllRute(req, res) {
@@ -134,11 +136,10 @@ class RuteController {
   static async getJumlahPenumpang(req, res) {
     try {
       const now = new Date()
-      now.setTime(now.getTime() + 7 * 60 * 60 * 1000)
-      const startDay = new Date(now)
-      startDay.setHours(0, 0, 0, 0)
-      const endDay = new Date(now)
-      endDay.setHours(23, 59, 59, 999)
+      const timeZoneOffset = 7 * 60 * 60 * 1000
+
+      const startOfToday = new Date(startOfDay(now).getTime() + timeZoneOffset)
+      const endOfToday = new Date(endOfDay(now).getTime() + timeZoneOffset)
 
       const response = await prisma.transaction.findMany({
         where: {
@@ -147,8 +148,8 @@ class RuteController {
             status: "done",
           },
           tanggal: {
-            gte: startDay,
-            lte: endDay,
+            gte: startOfToday,
+            lte: endOfToday,
           },
         },
       })
@@ -179,11 +180,61 @@ class RuteController {
         },
       })
 
+      const user = await prisma.users.findFirst({
+        where: {
+          id: req.user.id,
+        },
+      })
+
+      if (user.lat != null && user.long != null) {
+        const calculate = getDistanceFromLatLonInKm(
+          user.lat,
+          user.long,
+          response.filter((v) => v.is_done === false)[0].lat,
+          response.filter((v) => v.is_done === false)[0].long
+        )
+
+        console.log(calculate)
+
+        if (calculate <= 0.6) {
+          await prisma.rute.update({
+            where: {
+              id: response[0].id,
+            },
+            data: {
+              is_done: true,
+            },
+          })
+
+          const now = new Date()
+          const timeZoneOffset = 7 * 60 * 60 * 1000
+
+          const startOfToday = new Date(
+            startOfDay(now).getTime() + timeZoneOffset
+          )
+          const endOfToday = new Date(endOfDay(now).getTime() + timeZoneOffset)
+
+          await prisma.transaction.updateMany({
+            where: {
+              tujuan_id: response.filter((v) => v.is_done === false)[0].id,
+              tanggal: {
+                gte: startOfToday,
+                lte: endOfToday,
+              },
+            },
+            data: {
+              status: "done",
+            },
+          })
+        }
+      }
+
       return res.status(200).json({
         message: "Successfully get rute angkot",
         data: response,
       })
     } catch (error) {
+      console.log(error)
       return res
         .status(500)
         .json({ error: true, message: "Internal server error" })
