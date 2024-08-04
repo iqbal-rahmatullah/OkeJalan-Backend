@@ -1,32 +1,28 @@
+import { endOfDay, endOfToday, startOfDay, startOfToday } from "date-fns"
 import prisma from "../data/db.config.js"
 import getDifferenceInMinutes from "./DifferentTime.js"
+import moment from "moment-timezone"
 
 const formattedPerjalanan = async (perjalanan, id_angkot) => {
   if (perjalanan.length > 0) {
     const now = new Date()
-    let startOfDay = new Date(
-      now.setHours(
-        parseInt(perjalanan[0].jam_tiba.split(":")[0]),
-        parseInt(perjalanan[0].jam_tiba.split(":")[1]),
-        0,
-        0
-      )
-    )
-    let endOfDay = new Date(
-      now.setHours(
-        parseInt(perjalanan[perjalanan.length - 1].jam_tiba.split(":")[0]),
-        parseInt(perjalanan[perjalanan.length - 1].jam_tiba.split(":")[1]),
-        0,
-        0
-      )
-    )
+    const timeZoneOffset = 7 * 60 * 60 * 1000
+
+    const startOfToday = new Date(startOfDay(now).getTime() + timeZoneOffset)
+    // console.log("Start of Today:", startOfToday)
+
+    const endOfToday = new Date(endOfDay(now).getTime() + timeZoneOffset)
+    // console.log("End of Today:", endOfToday)
 
     let transactions = await prisma.transaction.findMany({
       where: {
         angkot_id: parseInt(id_angkot),
         tanggal: {
-          gte: startOfDay,
-          lte: endOfDay,
+          gte: startOfToday,
+          lte: endOfToday,
+        },
+        asal: {
+          tipe: perjalanan[0].tipe,
         },
       },
     })

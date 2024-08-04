@@ -1,6 +1,7 @@
 import { Router } from "express"
 import AngkotController from "../controllers/AngkotController.js"
 import authMiddleware from "../middleware/Authenticate.js"
+import authDriverMiddleware from "../middleware/DriverAuthenticate.js"
 const angkotRouter = Router()
 
 angkotRouter.get("/", (req, res) => {
@@ -17,6 +18,11 @@ angkotRouter.get(
   "/favorite",
   authMiddleware,
   AngkotController.getFavoriteAngkot
+)
+angkotRouter.put(
+  "/start-driver",
+  authDriverMiddleware,
+  AngkotController.startDriver
 )
 
 export default angkotRouter

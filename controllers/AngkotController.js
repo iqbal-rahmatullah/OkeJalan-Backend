@@ -186,6 +186,43 @@ class AngkotController {
       res.status(500).json({ error: true, message: "Internal server error" })
     }
   }
+
+  static async startDriver(req, res) {
+    try {
+      const { tipe, angkot_id } = req.body
+      const response = await prisma.transaction.updateMany({
+        where: {
+          asal: {
+            tipe,
+          },
+          angkot_id: parseInt(angkot_id),
+        },
+        data: {
+          status: "on_going",
+        },
+      })
+
+      if (response.count == 0) {
+        return res.status(404).json({
+          message: "Transaction not found",
+          data: {
+            tipe,
+          },
+        })
+      }
+
+      return res.status(200).json({
+        message: "Successfully start driver",
+        data: response,
+      })
+    } catch (error) {
+      res.status(500).json({
+        error: true,
+        message: "Internal server error",
+        data: error.message,
+      })
+    }
+  }
 }
 
 export default AngkotController
