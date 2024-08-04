@@ -145,6 +145,39 @@ class TransactionController {
         .json({ error: true, message: "Internal server error" })
     }
   }
+
+  static async getStatusTransaction(req, res) {
+    try {
+      const { id } = req.params
+
+      const response = await prisma.transaction.findFirst({
+        where: {
+          id: parseInt(id),
+        },
+        select: {
+          status: true,
+        },
+      })
+
+      if (response.length == 0) {
+        return res.status(404).json({
+          message: "Data not found",
+          data: response,
+        })
+      }
+
+      return res.status(200).json({
+        message: "Successfully get data",
+        data: response,
+      })
+    } catch (error) {
+      return res.status(500).json({
+        error: true,
+        message: "Internal server error",
+        data: error.message,
+      })
+    }
+  }
 }
 
 export default TransactionController

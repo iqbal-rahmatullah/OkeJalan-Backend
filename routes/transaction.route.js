@@ -21,5 +21,10 @@ transactionRouter.post(
   authMiddleware,
   TransactionController.createTransaction
 )
+transactionRouter.get(
+  "/get-transaction-status/:id",
+  authMiddleware,
+  TransactionController.getStatusTransaction
+)
 
 export default transactionRouter

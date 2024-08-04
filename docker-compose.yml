@@ -1,0 +1,36 @@
+services:
+  mysql:
+    container_name: db
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    networks:
+      - backend
+
+  service_appointment:
+    container_name: api
+    build: ./
+    ports:
+      - "8000:8000"
+    networks:
+      - backend
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"
+    networks:
+      - backend
+    environment:
+      - DB_NAME=meet_doctor
+      - DB_HOST=db
+      - DB_USERNAME=root
+      - DB_PASSWORD=password
+      - DATABASE_URL=mysql://root:password@db/meet_doctor
+
+networks:
+  backend:
+    driver: bridge
