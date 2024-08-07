@@ -16,6 +16,9 @@ class JadwalController {
             where: {
               alamat: asal,
             },
+            select: {
+              jam_tiba: true,
+            },
           },
         },
       })

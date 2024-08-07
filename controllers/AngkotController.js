@@ -1,38 +1,80 @@
+import { response } from "express"
 import prisma from "../data/db.config.js"
 import path from "path"
 
 class AngkotController {
   static async searchAngkot(req, res) {
     try {
-      const { lokasi_awal, tujuan } = req.body
+      const { lokasi_awal, tujuan, tipe } = req.body
 
-      const response = await prisma.angkot.findMany({
-        where: {
+      const responseBerangkat = await prisma.angkot.findMany({
+        include: {
           rute: {
-            some: {
-              alamat: {
-                in: [lokasi_awal, tujuan],
+            where: {
+              AND: {
+                alamat: {
+                  in: [lokasi_awal, tujuan],
+                },
+                tipe: "berangkat",
               },
             },
           },
+          fasilitas: true,
+          sopir: true,
         },
+      })
+
+      const responseBalik = await prisma.angkot.findMany({
         include: {
-          rute: true,
+          rute: {
+            where: {
+              AND: {
+                alamat: {
+                  in: [lokasi_awal, tujuan],
+                },
+                tipe: "balik",
+              },
+            },
+          },
           fasilitas: true,
           sopir: true,
         },
       })
 
       // Filter rute berdasarkan lokasi_awal dan tujuan
-      const matchedAngkots = response.filter((angkot) => {
+      const matchedAngkotsBerangkat = responseBerangkat.filter((angkot) => {
         const startIndex = angkot.rute.findIndex(
           (rute) => rute.alamat == lokasi_awal
         )
         const endIndex = angkot.rute.findIndex((rute) => rute.alamat == tujuan)
-        return startIndex !== -1 && endIndex !== -1 && endIndex > startIndex
+        console.log(startIndex, endIndex)
+        return (
+          startIndex !== -1 &&
+          endIndex !== -1 &&
+          (endIndex > startIndex ||
+            (endIndex <= startIndex &&
+              angkot.rute[endIndex].tipe != angkot.rute[startIndex].tipe))
+        )
       })
 
-      if (matchedAngkots.length == 0) {
+      const matchedAngkotsBalik = responseBalik.filter((angkot) => {
+        const startIndex = angkot.rute.findIndex(
+          (rute) => rute.alamat == lokasi_awal
+        )
+        const endIndex = angkot.rute.findIndex((rute) => rute.alamat == tujuan)
+        console.log(startIndex, endIndex)
+        return (
+          startIndex !== -1 &&
+          endIndex !== -1 &&
+          (endIndex > startIndex ||
+            (endIndex <= startIndex &&
+              angkot.rute[endIndex].tipe != angkot.rute[startIndex].tipe))
+        )
+      })
+
+      const finalData = [...matchedAngkotsBerangkat, ...matchedAngkotsBalik]
+
+      if (finalData.length == 0) {
         return res.status(404).json({
           message: "Angkot not found",
           data: {
@@ -42,7 +84,7 @@ class AngkotController {
         })
       }
 
-      matchedAngkots.forEach((angkot) => {
+      finalData.forEach((angkot) => {
         angkot.rute = angkot.rute.map((rute) => ({
           ...rute,
           isLokasiAwal: rute.alamat === lokasi_awal ? true : undefined,
@@ -55,7 +97,7 @@ class AngkotController {
         data: {
           tujuan,
           lokasi_awal,
-          angkot: matchedAngkots,
+          angkot: finalData,
         },
       })
     } catch (error) {
