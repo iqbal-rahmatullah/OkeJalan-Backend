@@ -68,7 +68,7 @@ model Payment {
   id         String        @id @default(uuid())
   user_id    Int
   amount     Int
-  snap_token String        @unique
+  snap_token String?       @unique
   status     PaymentStatus @default(pending)
   user       Users         @relation(fields: [user_id], references: [id])
   created_at DateTime      @default(now())

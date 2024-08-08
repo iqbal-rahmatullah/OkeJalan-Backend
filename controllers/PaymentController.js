@@ -19,10 +19,11 @@ class PaymentController {
 
       const orderId = `OJ-${Date.now()}`
 
-      const response = await snap.createTransaction({
+      const response = await snap.charge({
+        payment_type: "gopay",
         transaction_details: {
+          gross_amount: amount,
           order_id: orderId,
-          gross_amount: parseInt(amount),
         },
       })
 
@@ -31,7 +32,7 @@ class PaymentController {
           user_id: req.user.id,
           amount: parseInt(amount),
           id: orderId,
-          snap_token: response.token,
+          snap_token: response.actions[0].url,
         },
       })
 
@@ -39,7 +40,6 @@ class PaymentController {
         error: false,
         message: "Payment created successfully",
         data: transaction,
-        redirect_url: response.redirect_url,
       })
     } catch (error) {
       return res.status(500).json({
