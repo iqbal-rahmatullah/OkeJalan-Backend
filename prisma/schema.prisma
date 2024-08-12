@@ -60,6 +60,7 @@ model Users {
   angkot      Angkot[]
   rating      Rating[]
   Favorite    Favorite[]
+  UserVoucher UserVoucher[]
 
   @@map("user")
 }
@@ -161,6 +162,30 @@ model Chat {
   updated_at     DateTime @default(now())
 
   @@map("chat")
+}
+
+model UserVoucher {
+  id         Int     @id @default(autoincrement())
+  user_id    Int
+  voucher_id Int
+  is_used    Boolean @default(false)
+  user       Users   @relation(fields: [user_id], references: [id])
+  voucher    Voucher @relation(fields: [voucher_id], references: [id])
+
+  @@map("user_voucher")
+}
+
+model Voucher {
+  id          Int           @id @default(autoincrement())
+  name        String
+  nominal     Int
+  min_nominal Int
+  is_active   Boolean       @default(true)
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @default(now())
+  UserVoucher UserVoucher[]
+
+  @@map("voucher")
 }
 
 model ChatDetail {

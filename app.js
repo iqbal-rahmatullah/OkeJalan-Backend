@@ -17,6 +17,7 @@ import transactionRouter from "./routes/transaction.route.js"
 import jadwalRouter from "./routes/jadwal.route.js"
 import paymentRouter from "./routes/payment.route.js"
 import perjalananRouter from "./routes/perjalanan.route.js"
+import voucherRouter from "./routes/voucher.route.js"
 app.get("/", (req, res) => {
   res.json({ message: "OkeJalan API V1" })
 })
@@ -27,6 +28,7 @@ app.use("/api/v1/transaction", transactionRouter)
 app.use("/api/v1/jadwal", jadwalRouter)
 app.use("/api/v1/payment", paymentRouter)
 app.use("/api/v1/perjalanan", perjalananRouter)
+app.use("/api/v1/voucher", voucherRouter)
 
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`)
