@@ -1,11 +1,12 @@
 import { Router } from "express"
-import AngkotController from "../controllers/AngkotController.js"
 import authMiddleware from "../middleware/Authenticate.js"
+import VoucherController from "../controllers/VoucherController.js"
 const voucherRouter = Router()
 
 voucherRouter.get("/", (req, res) => {
   res.json({ message: "OkeJalan voucher service" })
 })
-voucherRouter.get("/all")
+voucherRouter.get("/all", authMiddleware, VoucherController.getAllVouhcer)
+voucherRouter.post("/claim", authMiddleware, VoucherController.claimVoucher)
 
 export default voucherRouter

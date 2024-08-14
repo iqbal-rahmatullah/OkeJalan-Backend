@@ -42,25 +42,25 @@ enum RuteType {
 }
 
 model Users {
-  id          Int           @id @default(autoincrement())
-  name        String        @db.VarChar(191)
-  email       String        @unique @db.VarChar(191)
-  no_hp       String        @unique
-  password    String
-  photo_url   String?
-  lat         String?
-  long        String?
-  is_new      Boolean       @default(true)
-  role        Role          @default(user)
-  balance     Int           @default(0)
-  created_at  DateTime      @default(now())
-  updated_at  DateTime      @default(now())
-  payment     Payment[]
-  transaction Transaction[]
-  angkot      Angkot[]
-  rating      Rating[]
-  Favorite    Favorite[]
-  UserVoucher UserVoucher[]
+  id           Int           @id @default(autoincrement())
+  name         String        @db.VarChar(191)
+  email        String        @unique @db.VarChar(191)
+  no_hp        String        @unique
+  password     String
+  photo_url    String?
+  lat          String?
+  long         String?
+  is_new       Boolean       @default(true)
+  role         Role          @default(user)
+  balance      Int           @default(0)
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @default(now())
+  payment      Payment[]
+  transaction  Transaction[]
+  angkot       Angkot[]
+  rating       Rating[]
+  Favorite     Favorite[]
+  user_voucher UserVoucher[]
 
   @@map("user")
 }
@@ -109,7 +109,7 @@ model Angkot {
   rute        Rute[]
   fasilitas   Fasilitas[]
   rating      Rating[]
-  Favorite    Favorite[]
+  favorite    Favorite[]
 
   @@map("angkot")
 }
@@ -168,7 +168,6 @@ model UserVoucher {
   id         Int     @id @default(autoincrement())
   user_id    Int
   voucher_id Int
-  is_used    Boolean @default(false)
   user       Users   @relation(fields: [user_id], references: [id])
   voucher    Voucher @relation(fields: [voucher_id], references: [id])
 
@@ -176,14 +175,14 @@ model UserVoucher {
 }
 
 model Voucher {
-  id          Int           @id @default(autoincrement())
-  name        String
-  nominal     Int
-  min_nominal Int
-  is_active   Boolean       @default(true)
-  created_at  DateTime      @default(now())
-  updated_at  DateTime      @default(now())
-  UserVoucher UserVoucher[]
+  id           Int           @id @default(autoincrement())
+  name         String
+  nominal      Int
+  min_nominal  Int
+  is_active    Boolean       @default(true)
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @default(now())
+  user_voucher UserVoucher[]
 
   @@map("voucher")
 }
