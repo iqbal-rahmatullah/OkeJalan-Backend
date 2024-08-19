@@ -1,6 +1,7 @@
 import { Router } from "express"
 import authMiddleware from "../middleware/Authenticate.js"
 import TransactionController from "../controllers/TransactionController.js"
+import authDriverMiddleware from "../middleware/DriverAuthenticate.js"
 const transactionRouter = Router()
 
 transactionRouter.get("/", (req, res) => {
@@ -25,6 +26,11 @@ transactionRouter.get(
   "/get-transaction-status/:id",
   authMiddleware,
   TransactionController.getStatusTransaction
+)
+transactionRouter.get(
+  "/get-penghasilan",
+  authDriverMiddleware,
+  TransactionController.getPenghasilan
 )
 
 export default transactionRouter

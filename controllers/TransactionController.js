@@ -1,7 +1,7 @@
 import axios from "axios"
 import prisma from "../data/db.config.js"
 import { format } from "date-fns"
-import { id } from "date-fns/locale"
+import { id, tr } from "date-fns/locale"
 
 class TransactionController {
   static async getTransaction(req, res) {
@@ -169,6 +169,56 @@ class TransactionController {
       return res.status(200).json({
         message: "Successfully get data",
         data: response,
+      })
+    } catch (error) {
+      return res.status(500).json({
+        error: true,
+        message: "Internal server error",
+        data: error.message,
+      })
+    }
+  }
+
+  static async getPenghasilan(req, res) {
+    try {
+      const { id } = req.user
+      const angkot = await prisma.angkot.findFirst({
+        where: {
+          id_sopir: id,
+        },
+        select: {
+          id: true,
+        },
+      })
+
+      if (!angkot) {
+        return res.status(200).json({
+          message: "Successfully get data",
+          data: {
+            penghasilan: 0,
+          },
+        })
+      }
+
+      const transaction = await prisma.transaction.findMany({
+        where: {
+          angkot_id: angkot.id,
+          status: "done",
+        },
+        select: {
+          price: true,
+        },
+      })
+
+      const total = transaction.reduce((acc, curr) => {
+        return acc + curr.price
+      }, 0)
+
+      return res.status(200).json({
+        message: "Successfully get data",
+        data: {
+          penghasilan: total,
+        },
       })
     } catch (error) {
       return res.status(500).json({
