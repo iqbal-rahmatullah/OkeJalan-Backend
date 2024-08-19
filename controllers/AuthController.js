@@ -291,6 +291,28 @@ class AuthController {
         data: payload,
       })
 
+      if (user.role === "driver") {
+        const newData = await prisma.users.findFirst({
+          where: {
+            id: user.id,
+          },
+        })
+
+        const angkot = await prisma.angkot.findFirst({
+          where: {
+            id_sopir: newData.id,
+          },
+        })
+
+        return res.status(200).json({
+          message: "Succesfully get detail user",
+          data: {
+            ...newData,
+            angkot_id: angkot.id,
+          },
+        })
+      }
+
       const newData = await prisma.users.findFirst({
         where: {
           id: user.id,
