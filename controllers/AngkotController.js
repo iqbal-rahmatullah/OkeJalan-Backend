@@ -1,11 +1,14 @@
 import { response } from "express"
 import prisma from "../data/db.config.js"
 import path from "path"
+import moment from "moment-timezone"
 
 class AngkotController {
   static async searchAngkot(req, res) {
     try {
       const { lokasi_awal, tujuan, tipe } = req.body
+
+      const timeWIB = moment.tz("Asia/Jakarta").format("HH:mm")
 
       const responseBerangkat = await prisma.angkot.findMany({
         include: {
@@ -16,6 +19,9 @@ class AngkotController {
                   in: [lokasi_awal, tujuan],
                 },
                 tipe: "berangkat",
+                jam_tiba: {
+                  gte: timeWIB,
+                },
               },
             },
           },
@@ -33,6 +39,9 @@ class AngkotController {
                   in: [lokasi_awal, tujuan],
                 },
                 tipe: "balik",
+                jam_tiba: {
+                  gte: timeWIB,
+                },
               },
             },
           },
