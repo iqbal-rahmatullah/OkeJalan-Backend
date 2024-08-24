@@ -9,10 +9,8 @@ const formattedPerjalanan = async (perjalanan, id_angkot) => {
     const timeZoneOffset = 7 * 60 * 60 * 1000
 
     const startOfToday = new Date(startOfDay(now).getTime() + timeZoneOffset)
-    // console.log("Start of Today:", startOfToday)
 
     const endOfToday = new Date(endOfDay(now).getTime() + timeZoneOffset)
-    // console.log("End of Today:", endOfToday)
 
     let transactions = await prisma.transaction.findMany({
       where: {
