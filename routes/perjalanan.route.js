@@ -20,12 +20,6 @@ perjalananRouter.get(
   PerjalananController.getLocationDriver
 )
 
-// perjalananRouter.get(
-//   "/terdekat",
-//   authDriverMiddleware,
-//   PerjalananController.getPerjalananTerdekat
-// )
-
 perjalananRouter.get(
   "/get-penumpang",
   authDriverMiddleware,

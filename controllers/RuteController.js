@@ -180,6 +180,15 @@ class RuteController {
         },
       })
 
+      const checkDone = response.filter((v) => v.is_done === false)
+
+      if (checkDone.length <= 0) {
+        return res.status(200).json({
+          message: "Successfully get rute angkot",
+          data: response,
+        })
+      }
+
       const user = await prisma.users.findFirst({
         where: {
           id: req.user.id,
@@ -193,8 +202,6 @@ class RuteController {
           response.filter((v) => v.is_done === false)[0].lat,
           response.filter((v) => v.is_done === false)[0].long
         )
-
-        console.log(calculate)
 
         if (calculate <= 0.6) {
           await prisma.rute.update({

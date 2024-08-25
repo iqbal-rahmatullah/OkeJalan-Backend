@@ -76,7 +76,9 @@ class PerjalananController {
       if (rute.length > 0) {
         return res.status(400).json({
           error: true,
-          message: "Ada rute yang belum selesai.",
+          message: {
+            rute: "Ada rute yang belum selesai",
+          },
         })
       }
 
@@ -87,7 +89,20 @@ class PerjalananController {
 
       const endOfToday = new Date(endOfDay(now).getTime() + timeZoneOffset)
 
-      const transactions = await prisma.transaction.updateMany({
+      const transactionsToUpdate = await prisma.transaction.findMany({
+        where: {
+          angkot_id: parseInt(angkot_id),
+          asal: {
+            tipe: tipe,
+          },
+          tanggal: {
+            gte: startOfToday,
+            lte: endOfToday,
+          },
+        },
+      })
+
+      await prisma.transaction.updateMany({
         where: {
           angkot_id: parseInt(angkot_id),
           asal: {
@@ -103,9 +118,29 @@ class PerjalananController {
         },
       })
 
+      const increaseBalancePromises = transactionsToUpdate.map(
+        (transaction) => {
+          return prisma.users.update({
+            where: {
+              id: req.user.id,
+            },
+            data: {
+              balance: {
+                increment: transaction.price,
+              },
+            },
+          })
+        }
+      )
+
+      const increaseBalance = await Promise.all(increaseBalancePromises)
+
       return res.status(200).json({
         message: "Perjalanan berhasil diselesaikan",
-        data: transactions,
+        data: {
+          transactions: transactionsToUpdate,
+          increaseBalance,
+        },
       })
     } catch (error) {
       console.log(error)
@@ -149,66 +184,6 @@ class PerjalananController {
       })
     }
   }
-
-  // static async getPerjalananTerdekat(req, res) {
-  //   try {
-  //     const { id_angkot } = req.params
-  //     const waktuMulai = moment
-  //       .tz("Asia/Jakarta")
-  //       .startOf("day")
-  //       .add(1, "minute")
-  //       .format("YYYY-MM-DD HH:mm:ss")
-
-  //     const waktuAkhir = moment
-  //       .tz("Asia/Jakarta")
-  //       .endOf("day")
-  //       .subtract(1, "minute")
-  //       .format("YYYY-MM-DD HH:mm:ss")
-
-  //     const ruteBerangkat = await prisma.rute.findMany({
-  //       where: {
-  //         id_angkot: parseInt(id_angkot),
-  //         tipe: "berangkat",
-  //       },
-  //     })
-  //     const rutePulang = await prisma.rute.findMany({
-  //       where: {
-  //         id_angkot: parseInt(id_angkot),
-  //         tipe: "balik",
-  //       },
-  //     })
-
-  //     if (ruteBerangkat.length === 0 && rutePulang.length === 0) {
-  //       return res.status(404).json({
-  //         error: true,
-  //         message: "Rute angkot tidak ditemukan",
-  //       })
-  //     }
-
-  //     //Get jumlah penumpang
-  //     const finalRuteBerangkat = await formattedPerjalanan(
-  //       ruteBerangkat,
-  //       id_angkot
-  //     )
-  //     const finalRutePulang = await formattedPerjalanan(rutePulang, id_angkot)
-
-  //     const data = []
-  //     if (finalRuteBerangkat) data.push(finalRuteBerangkat)
-  //     if (finalRutePulang) data.push(finalRutePulang)
-
-  //     return res.status(200).json({
-  //       message: "Successfully get perjalanan hari ini",
-  //       data: data.length ? data[0] : [],
-  //     })
-  //   } catch (error) {
-  //     console.log(error)
-  //     return res.status(500).json({
-  //       error: true,
-  //       message: "Internal server error",
-  //       data: error.message,
-  //     })
-  //   }
-  // }
 
   static async getPenumpang(req, res) {
     try {
