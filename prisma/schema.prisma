@@ -156,10 +156,11 @@ model Rute {
 }
 
 model Chat {
-  id             Int      @id @default(autoincrement())
+  id             Int          @id @default(autoincrement())
   transaction_id Int
-  created_at     DateTime @default(now())
-  updated_at     DateTime @default(now())
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @default(now())
+  chatDetails    ChatDetail[]
 
   @@map("chat")
 }
@@ -193,6 +194,7 @@ model ChatDetail {
   sender_id   Int
   receiver_id Int
   message     String
+  chats       Chat     @relation(fields: [chat_id], references: [id])
   created_at  DateTime @default(now())
   updated_at  DateTime @default(now())
 

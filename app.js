@@ -18,6 +18,7 @@ import jadwalRouter from "./routes/jadwal.route.js"
 import paymentRouter from "./routes/payment.route.js"
 import perjalananRouter from "./routes/perjalanan.route.js"
 import voucherRouter from "./routes/voucher.route.js"
+import chatRouter from "./routes/chat.route.js"
 import prisma from "./data/db.config.js"
 app.get("/", (req, res) => {
   res.json({ message: "OkeJalan API V1" })
@@ -30,6 +31,7 @@ app.use("/api/v1/jadwal", jadwalRouter)
 app.use("/api/v1/payment", paymentRouter)
 app.use("/api/v1/perjalanan", perjalananRouter)
 app.use("/api/v1/voucher", voucherRouter)
+app.use("/api/v1/chats", chatRouter)
 
 cron.schedule("0 0 * * *", async () => {
   try {
