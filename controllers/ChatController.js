@@ -5,6 +5,8 @@ class ChatController {
   static async openChat(req, res) {
     try {
       const { transaction_id } = req.body
+      const userId = req.user.id
+
       const checkChat = await prisma.chat.findFirst({
         where: {
           transaction_id: parseInt(transaction_id),
@@ -25,10 +27,14 @@ class ChatController {
       }
 
       const nonReceiverChatDetailsCount = checkChat.chatDetails
-        ? checkChat.chatDetails.filter(
-            (detail) => detail.sender_id !== req.user.id
-          ).length
+        ? checkChat.chatDetails.filter((detail) => detail.sender_id !== userId)
+            .length
         : 0
+
+      checkChat.chatDetails = checkChat.chatDetails.map((detail) => ({
+        ...detail,
+        isMe: detail.sender_id === userId,
+      }))
 
       checkChat.jumlahPesan = nonReceiverChatDetailsCount
 
