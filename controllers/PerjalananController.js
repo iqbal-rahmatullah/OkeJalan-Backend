@@ -35,12 +35,77 @@ class PerjalananController {
       const finalRutePulang = await formattedPerjalanan(rutePulang, id_angkot)
 
       const data = []
-      if (finalRuteBerangkat) data.push(finalRuteBerangkat)
-      if (finalRutePulang) data.push(finalRutePulang)
+      if (ruteBerangkat.some((rute) => !rute.is_done)) {
+        const finalRuteBerangkat = await formattedPerjalanan(
+          ruteBerangkat,
+          id_angkot
+        )
+        if (finalRuteBerangkat) data.push(finalRuteBerangkat)
+      }
+
+      if (rutePulang.some((rute) => !rute.is_done)) {
+        const finalRutePulang = await formattedPerjalanan(rutePulang, id_angkot)
+        if (finalRutePulang) data.push(finalRutePulang)
+      }
 
       return res.status(200).json({
         message: "Successfully get perjalanan hari ini",
         data: data.length ? data : null,
+      })
+    } catch (error) {
+      console.log(error)
+      return res.status(500).json({
+        error: true,
+        message: "Internal server error",
+        data: error.message,
+      })
+    }
+  }
+
+  static async selesai(req, res) {
+    try {
+      const { angkot_id, tipe } = req.body
+      const rute = await prisma.rute.findMany({
+        where: {
+          id_angkot: parseInt(angkot_id),
+          tipe,
+          is_done: false,
+        },
+      })
+
+      if (rute.length > 0) {
+        return res.status(400).json({
+          error: true,
+          message: "Ada rute yang belum selesai.",
+        })
+      }
+
+      const now = new Date()
+      const timeZoneOffset = 7 * 60 * 60 * 1000
+
+      const startOfToday = new Date(startOfDay(now).getTime() + timeZoneOffset)
+
+      const endOfToday = new Date(endOfDay(now).getTime() + timeZoneOffset)
+
+      const transactions = await prisma.transaction.updateMany({
+        where: {
+          angkot_id: parseInt(angkot_id),
+          asal: {
+            tipe: tipe,
+          },
+          tanggal: {
+            gte: startOfToday,
+            lte: endOfToday,
+          },
+        },
+        data: {
+          status: "done",
+        },
+      })
+
+      return res.status(200).json({
+        message: "Perjalanan berhasil diselesaikan",
+        data: transactions,
       })
     } catch (error) {
       console.log(error)

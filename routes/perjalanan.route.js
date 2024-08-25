@@ -32,4 +32,10 @@ perjalananRouter.get(
   PerjalananController.getPenumpang
 )
 
+perjalananRouter.post(
+  "/selesai",
+  authDriverMiddleware,
+  PerjalananController.selesai
+)
+
 export default perjalananRouter
