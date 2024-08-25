@@ -152,6 +152,60 @@ class PerjalananController {
     }
   }
 
+  static async berhentiDarurat(req, res) {
+    try {
+      const { angkot_id, tipe } = req.body
+
+      const ruteUpdate = await prisma.rute.updateMany({
+        where: {
+          id_angkot: parseInt(angkot_id),
+          tipe,
+          is_done: false,
+        },
+        data: {
+          is_done: true,
+        },
+      })
+
+      const now = new Date()
+      const timeZoneOffset = 7 * 60 * 60 * 1000
+
+      const startOfToday = new Date(startOfDay(now).getTime() + timeZoneOffset)
+
+      const endOfToday = new Date(endOfDay(now).getTime() + timeZoneOffset)
+
+      await prisma.transaction.updateMany({
+        where: {
+          angkot_id: parseInt(angkot_id),
+          asal: {
+            tipe: tipe,
+          },
+          tanggal: {
+            gte: startOfToday,
+            lte: endOfToday,
+          },
+        },
+        data: {
+          status: "done",
+        },
+      })
+
+      return res.status(200).json({
+        message: "Perjalanan berhasil diselesaikan",
+        data: {
+          ruteUpdate,
+        },
+      })
+    } catch (error) {
+      console.log(error)
+      return res.status(500).json({
+        error: true,
+        message: "Internal server error",
+        data: error.message,
+      })
+    }
+  }
+
   static async getLocationDriver(req, res) {
     try {
       const response = await prisma.users.findFirst({

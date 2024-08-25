@@ -32,4 +32,10 @@ perjalananRouter.post(
   PerjalananController.selesai
 )
 
+perjalananRouter.post(
+  "/berhenti-darurat",
+  authDriverMiddleware,
+  PerjalananController.berhentiDarurat
+)
+
 export default perjalananRouter
