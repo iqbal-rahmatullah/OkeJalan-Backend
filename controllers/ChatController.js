@@ -48,11 +48,11 @@ class ChatController {
 
   static async sendMessage(req, res) {
     try {
-      const { chat_id, message, receiver_id } = req.body
+      const { transaction_id, message, receiver_id } = req.body
 
       const checkChat = await prisma.chat.findFirst({
         where: {
-          id: parseInt(chat_id),
+          transaction_id: parseInt(transaction_id),
         },
       })
 
@@ -62,7 +62,7 @@ class ChatController {
 
       const createChatDetail = await prisma.chatDetail.create({
         data: {
-          chat_id: parseInt(chat_id),
+          chat_id: checkChat.id,
           message,
           receiver_id: parseInt(receiver_id),
           sender_id: req.user.id,

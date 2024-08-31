@@ -6,7 +6,7 @@ import moment from "moment-timezone"
 class AngkotController {
   static async searchAngkot(req, res) {
     try {
-      const { lokasi_awal, tujuan, tipe } = req.body
+      const { lokasi_awal, tujuan, tipe, tanggal } = req.body
 
       const timeWIB = moment.tz("Asia/Jakarta").format("HH:mm")
 
@@ -20,7 +20,7 @@ class AngkotController {
                 },
                 tipe: "berangkat",
                 jam_tiba: {
-                  gte: timeWIB,
+                  gte: tanggal == null ? timeWIB : undefined,
                 },
               },
             },
@@ -40,7 +40,7 @@ class AngkotController {
                 },
                 tipe: "balik",
                 jam_tiba: {
-                  gte: timeWIB,
+                  gte: tanggal == null ? timeWIB : undefined,
                 },
               },
             },
