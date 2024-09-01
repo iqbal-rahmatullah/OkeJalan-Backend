@@ -3,7 +3,7 @@ import { faker } from "@faker-js/faker"
 import bcrypt from "bcryptjs"
 
 const userSeeder = async () => {
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 30; i++) {
     await prisma.users.create({
       data: {
         name: faker.person.fullName(),

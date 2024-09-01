@@ -12,24 +12,24 @@ const main = async () => {
   // } catch (error) {
   //   console.log("Error in user seeder:", error)
   // }
-  // try {
-  //   await angkotSeeder()
-  //   console.log("Angkot seeder completed")
-  // } catch (error) {
-  //   console.log("Error in angkot seeder:", error)
-  // }
-  // try {
-  //   await fasilitasSeeder()
-  //   console.log("Fasilitas seeder completed")
-  // } catch (error) {
-  //   console.log("Error in fasilitas seeder:", error)
-  // }
-  // try {
-  //   await ruteSeeder()
-  //   console.log("Rute seeder completed")
-  // } catch (error) {
-  //   console.log("Error in rute seeder:", error)
-  // }
+  try {
+    await angkotSeeder()
+    console.log("Angkot seeder completed")
+  } catch (error) {
+    console.log("Error in angkot seeder:", error)
+  }
+  try {
+    await fasilitasSeeder()
+    console.log("Fasilitas seeder completed")
+  } catch (error) {
+    console.log("Error in fasilitas seeder:", error)
+  }
+  try {
+    await ruteSeeder()
+    console.log("Rute seeder completed")
+  } catch (error) {
+    console.log("Error in rute seeder:", error)
+  }
   // try {
   //   await ratingSeeder()
   //   console.log("Rating seeder completed")
