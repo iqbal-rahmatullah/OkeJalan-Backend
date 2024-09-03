@@ -80,7 +80,7 @@ class TransactionController {
           distanceAsString,
           durationAsSecond,
           durationAsMinute,
-          price: fixPrice,
+          price: 5000,
         },
       })
     } catch (error) {
